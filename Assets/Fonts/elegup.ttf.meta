@@ -1,0 +1,21 @@
+fileFormatVersion: 2
+guid: 03ad5b139d57447d5843c45b1b02fb4e
+timeCreated: 1508472837
+licenseType: Free
+TrueTypeFontImporter:
+  serializedVersion: 4
+  fontSize: 16
+  forceTextureCase: -2
+  characterSpacing: 0
+  characterPadding: 1
+  includeFontData: 1
+  fontName: a_b_c
+  fontNames:
+  - a_b_c
+  fallbackFontReferences: []
+  customCharacters: 
+  fontRenderingMode: 0
+  ascentCalculationMode: 1
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

@@ -9,11 +9,12 @@ namespace UnityStandardAssets._2D
     {
         private PlatformerCharacter2D m_Character;
         private bool m_Jump;
-
+		[SerializeField] private float _speed = 10f;     
+		[SerializeField] private float h = 0;
 
         private void Awake()
         {
-            m_Character = GetComponent<PlatformerCharacter2D>();
+            m_Character = GetComponent<PlatformerCharacter2D>();   
         }
 
 
@@ -30,10 +31,25 @@ namespace UnityStandardAssets._2D
         private void FixedUpdate()
         {
             // Read the inputs.
-            bool crouch = Input.GetKey(KeyCode.LeftControl);
-            float h = CrossPlatformInputManager.GetAxis("Horizontal");
+            //bool crouch = Input.GetKey(KeyCode.LeftControl);
+
+			h = (m_Character.m_FacingRight ? 1 : -1) * _speed * Time.deltaTime;
+//			if (m_Character.m_FacingRight)
+//				h = 1 * _speed * Time.deltaTime;
+//				//transform.Translate (Vector2.right * _speed * Time.deltaTime);
+//			else
+//				Time.deltaTime
+//				transform.Translate (-Vector2.right * _speed * Time.deltaTime);
+
+			if(transform.position.x >= 1.85f && m_Character.m_FacingRight) {
+				m_Character.Flip ();
+			}
+
+			if(transform.position.x <= -1.85 && !m_Character.m_FacingRight) {
+				m_Character.Flip ();
+			}
             // Pass all parameters to the character control script.
-            m_Character.Move(h, crouch, m_Jump);
+            m_Character.Move(h, m_Jump);
             m_Jump = false;
         }
     }

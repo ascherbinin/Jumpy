@@ -8,7 +8,7 @@ namespace UnityStandardAssets._2D
         [SerializeField] private float m_MaxSpeed = 10f;                    // The fastest the player can travel in the x axis.
         [SerializeField] private float m_JumpForce = 400f;                  // Amount of force added when the player jumps.
         //[Range(0, 1)] [SerializeField] private float m_CrouchSpeed = .36f;  // Amount of maxSpeed applied to crouching movement. 1 = 100%
-        [SerializeField] private bool m_AirControl = false;                 
+        //[SerializeField] private bool m_AirControl = true;                 
         [SerializeField] private LayerMask m_WhatIsGround;    
 		[SerializeField] private LayerMask m_WhatIsWall;  
 
@@ -21,8 +21,10 @@ namespace UnityStandardAssets._2D
         const float k_CeilingRadius = .01f; // Radius of the overlap circle to determine if the player can stand up
         //private Animator m_Anim;            // Reference to the player's animator component.
 		[SerializeField]  private Rigidbody2D m_Rigidbody2D;
-        private bool m_FacingRight = true;  // For determining which way the player is currently facing.
+        public bool m_FacingRight = true;  // For determining which way the player is currently facing.
 
+		[SerializeField] private float _startSpriteScaleX;
+		private Transform _spriteTransform;
 		//double jump
 		bool m_doubleJump = false;
 
@@ -34,6 +36,8 @@ namespace UnityStandardAssets._2D
 			m_WallCheck = transform.Find("WallCheck");
             //m_Anim = GetComponent<Animator>();
             m_Rigidbody2D = GetComponent<Rigidbody2D>();
+			_spriteTransform = transform.Find("PlayerSprite");
+			_startSpriteScaleX = _spriteTransform.localScale.x;
         }
 
 
@@ -52,8 +56,9 @@ namespace UnityStandardAssets._2D
 
 			m_Walled = Physics2D.OverlapCircle(m_WallCheck.position, k_WallRadius, m_WhatIsWall);
 
-			if (m_Walled) 
+			if (m_Walled && !m_Grounded) 
 			{
+				FlipSprite (!m_FacingRight);
 				//m_Grounded = false; 
 				m_doubleJump = false; 
 			}
@@ -64,7 +69,7 @@ namespace UnityStandardAssets._2D
         }
 
 
-        public void Move(float move, bool crouch, bool jump)
+		public void Move(float move, bool jump)
         {
 //            // If crouching, check to see if the character can stand up
 //            if (!crouch && m_Anim.GetBool("Crouch"))
@@ -80,40 +85,45 @@ namespace UnityStandardAssets._2D
            // m_Anim.SetBool("Crouch", crouch);
 
             //only control the player if grounded or airControl is turned on
-            if (m_Grounded || m_AirControl)
+			if (m_Grounded)
             {
-
-                // The Speed animator parameter is set to the absolute value of the horizontal input.
-                //m_Anim.SetFloat("Speed", Mathf.Abs(move));
-
-                // Move the character
-                m_Rigidbody2D.velocity = new Vector2(move*m_MaxSpeed, m_Rigidbody2D.velocity.y);
-
-                // If the input is moving the player right and the player is facing left...
-                if (move > 0 && !m_FacingRight)
-                {
-                    // ... flip the player.
-                    Flip();
-                }
-                    // Otherwise if the input is moving the player left and the player is facing right...
-                else if (move < 0 && m_FacingRight)
-                {
-                    // ... flip the player.
-                    Flip();
-                }
+//
+//                // The Speed animator parameter is set to the absolute value of the horizontal input.
+//                //m_Anim.SetFloat("Speed", Mathf.Abs(move));
+//
+//                // Move the character
+                m_Rigidbody2D.velocity = new Vector2(move, m_Rigidbody2D.velocity.y);
+				Debug.Log (move);
+////                // If the input is moving the player right and the player is facing left...
+////                if (move > 0 && !m_FacingRight)
+////                {
+////                    // ... flip the player.
+////                    Flip();
+////                }
+////                    // Otherwise if the input is moving the player left and the player is facing right...
+////                else if (move < 0 && m_FacingRight)
+////                {
+////                    // ... flip the player.
+////                    Flip();
+////                }
             }
             // If the player should jump...
-            if (m_Grounded && jump)
+			if (m_Grounded && jump)
             {
                 // Add a vertical force to the player.
-                m_Grounded = false;
+
                 //m_Anim.SetBool("Ground", false);
-                m_Rigidbody2D.AddForce(new Vector2(0f, m_JumpForce));
+				m_Rigidbody2D.AddForce(new Vector2((m_FacingRight ? 1 : -1) * m_JumpForce, m_JumpForce));
             }
+
+			if (m_Walled && jump) {
+				Flip ();
+				m_Rigidbody2D.AddForce(new Vector2((m_FacingRight ? 1 : -1) * m_JumpForce, m_JumpForce));
+			}
         }
 
 
-        private void Flip()
+        public void Flip()
         {
             // Switch the way the player is labelled as facing.
             m_FacingRight = !m_FacingRight;
@@ -123,5 +133,11 @@ namespace UnityStandardAssets._2D
             theScale.x *= -1;
             transform.localScale = theScale;
         }
+
+		private void FlipSprite(bool toRight)
+		{
+			var xScale = toRight ? _startSpriteScaleX : -_startSpriteScaleX;
+			_spriteTransform.localScale = new Vector3 (xScale, _spriteTransform.localScale.y, _spriteTransform.localScale.z);
+		}
     }
 }

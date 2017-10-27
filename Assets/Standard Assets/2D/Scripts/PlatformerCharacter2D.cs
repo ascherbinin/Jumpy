@@ -15,29 +15,28 @@ namespace UnityStandardAssets._2D
 		private Transform m_GroundCheck;    
         const float k_GroundedRadius = .2f; 
 		const float k_WallRadius = .1f; 
-		private bool m_Grounded;     
+		[SerializeField] private bool m_Grounded;  
+		public bool isGrounded { get { return m_Grounded; } }
 		[SerializeField] private bool m_Walled;  
-		[SerializeField] private Transform m_WallCheck;   
+		[SerializeField] private Transform m_WallCheckR;   
+		[SerializeField] private Transform m_WallCheckL;   
         const float k_CeilingRadius = .01f; // Radius of the overlap circle to determine if the player can stand up
         //private Animator m_Anim;            // Reference to the player's animator component.
 		[SerializeField]  private Rigidbody2D m_Rigidbody2D;
         public bool m_FacingRight = true;  // For determining which way the player is currently facing.
-
-		[SerializeField] private float _startSpriteScaleX;
 		private Transform _spriteTransform;
 		//double jump
-		bool m_doubleJump = false;
+		//private bool m_doubleJump = false;
 
 
         private void Awake()
         {
             // Setting up references.
             m_GroundCheck = transform.Find("GroundCheck");
-			m_WallCheck = transform.Find("WallCheck");
+			m_WallCheckR = transform.Find("WallCheckRightSide");
+			m_WallCheckL = transform.Find("WallCheckLeftSide");
             //m_Anim = GetComponent<Animator>();
             m_Rigidbody2D = GetComponent<Rigidbody2D>();
-			_spriteTransform = transform.Find("PlayerSprite");
-			_startSpriteScaleX = _spriteTransform.localScale.x;
         }
 
 
@@ -54,18 +53,14 @@ namespace UnityStandardAssets._2D
 				}
 			}
 
-			m_Walled = Physics2D.OverlapCircle(m_WallCheck.position, k_WallRadius, m_WhatIsWall);
+			m_Walled = (Physics2D.OverlapCircle(m_WallCheckL.position, k_WallRadius, m_WhatIsWall) ||
+				Physics2D.OverlapCircle(m_WallCheckR.position, k_WallRadius, m_WhatIsWall)) &&
+				!m_Grounded;
 
-			if (m_Walled && !m_Grounded) 
-			{
-				FlipSprite (!m_FacingRight);
-				//m_Grounded = false; 
-				m_doubleJump = false; 
-			}
-            //m_Anim.SetBool("Ground", m_Grounded);
-
-            // Set the vertical animation
-            //m_Anim.SetFloat("vSpeed", m_Rigidbody2D.velocity.y);
+			if (m_Walled && !m_FacingRight)
+				Flip ();
+			else if (m_Walled && m_FacingRight)
+				Flip ();
         }
 
 
@@ -93,7 +88,6 @@ namespace UnityStandardAssets._2D
 //
 //                // Move the character
                 m_Rigidbody2D.velocity = new Vector2(move, m_Rigidbody2D.velocity.y);
-				Debug.Log (move);
 ////                // If the input is moving the player right and the player is facing left...
 ////                if (move > 0 && !m_FacingRight)
 ////                {
@@ -108,18 +102,10 @@ namespace UnityStandardAssets._2D
 ////                }
             }
             // If the player should jump...
-			if (m_Grounded && jump)
+			if ((m_Grounded || m_Walled) && jump)
             {
-                // Add a vertical force to the player.
-
-                //m_Anim.SetBool("Ground", false);
 				m_Rigidbody2D.AddForce(new Vector2((m_FacingRight ? 1 : -1) * m_JumpForce, m_JumpForce));
             }
-
-			if (m_Walled && jump) {
-				Flip ();
-				m_Rigidbody2D.AddForce(new Vector2((m_FacingRight ? 1 : -1) * m_JumpForce, m_JumpForce));
-			}
         }
 
 
@@ -127,17 +113,11 @@ namespace UnityStandardAssets._2D
         {
             // Switch the way the player is labelled as facing.
             m_FacingRight = !m_FacingRight;
-
             // Multiply the player's x local scale by -1.
             Vector3 theScale = transform.localScale;
             theScale.x *= -1;
             transform.localScale = theScale;
         }
-
-		private void FlipSprite(bool toRight)
-		{
-			var xScale = toRight ? _startSpriteScaleX : -_startSpriteScaleX;
-			_spriteTransform.localScale = new Vector3 (xScale, _spriteTransform.localScale.y, _spriteTransform.localScale.z);
-		}
+			
     }
 }

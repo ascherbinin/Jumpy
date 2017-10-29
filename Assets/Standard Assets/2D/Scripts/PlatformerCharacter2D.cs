@@ -5,8 +5,7 @@ namespace UnityStandardAssets._2D
 {
     public class PlatformerCharacter2D : MonoBehaviour
     {
-        [SerializeField] private float m_MaxSpeed = 10f;                    // The fastest the player can travel in the x axis.
-        [SerializeField] private float m_JumpForce = 400f;                  // Amount of force added when the player jumps.
+       [SerializeField] private float m_JumpForce = 400f;                  // Amount of force added when the player jumps.
         //[Range(0, 1)] [SerializeField] private float m_CrouchSpeed = .36f;  // Amount of maxSpeed applied to crouching movement. 1 = 100%
         //[SerializeField] private bool m_AirControl = true;                 
         [SerializeField] private LayerMask m_WhatIsGround;    
@@ -18,6 +17,8 @@ namespace UnityStandardAssets._2D
 		[SerializeField] private bool m_Grounded;  
 		public bool isGrounded { get { return m_Grounded; } }
 		[SerializeField] private bool m_Walled;  
+		[SerializeField] private bool m_WalledLeft;  
+		[SerializeField] private bool m_WalledRight;  
 		[SerializeField] private Transform m_WallCheckR;   
 		[SerializeField] private Transform m_WallCheckL;   
         const float k_CeilingRadius = .01f; // Radius of the overlap circle to determine if the player can stand up
@@ -25,8 +26,10 @@ namespace UnityStandardAssets._2D
 		[SerializeField]  private Rigidbody2D m_Rigidbody2D;
         public bool m_FacingRight = true;  // For determining which way the player is currently facing.
 		private Transform _spriteTransform;
-		//double jump
-		//private bool m_doubleJump = false;
+
+		[SerializeField] private bool _doubleJump = false;
+		[SerializeField] private bool _inAir = false;
+		[SerializeField] private Transform _playerSprite;  
 
 
         private void Awake()
@@ -35,6 +38,7 @@ namespace UnityStandardAssets._2D
             m_GroundCheck = transform.Find("GroundCheck");
 			m_WallCheckR = transform.Find("WallCheckRightSide");
 			m_WallCheckL = transform.Find("WallCheckLeftSide");
+			_playerSprite = transform.Find("PlayerSprite");
             //m_Anim = GetComponent<Animator>();
             m_Rigidbody2D = GetComponent<Rigidbody2D>();
         }
@@ -44,80 +48,55 @@ namespace UnityStandardAssets._2D
         {
             m_Grounded = false;
 			m_Walled = false;
+			_inAir = true;
             // The player is grounded if a circlecast to the groundcheck position hits anything designated as ground
             // This can be done using layers instead but Sample Assets will not overwrite your project settings.
-            Collider2D[] colliders = Physics2D.OverlapCircleAll(m_GroundCheck.position, k_GroundedRadius, m_WhatIsGround);
-			foreach (var item in colliders) {
-				if (item.gameObject != gameObject) {
-					m_Grounded = true;
-				}
+			m_Grounded = Physics2D.OverlapCircleAll(m_GroundCheck.position, k_GroundedRadius, m_WhatIsGround);
+
+			m_WalledLeft =  Physics2D.OverlapCircle(m_WallCheckL.position, k_WallRadius, m_WhatIsWall)  && !m_Grounded;
+			m_WalledRight = Physics2D.OverlapCircle(m_WallCheckR.position, k_WallRadius, m_WhatIsWall) && !m_Grounded;
+
+			if (m_WalledLeft || m_WalledRight) {
+				m_Walled = true;
+				if (_inAir)
+					Flip ();
+			}
+//
+			if (m_Walled || m_Grounded) {
+				_inAir = false;
+				_doubleJump = false;
 			}
 
-			m_Walled = (Physics2D.OverlapCircle(m_WallCheckL.position, k_WallRadius, m_WhatIsWall) ||
-				Physics2D.OverlapCircle(m_WallCheckR.position, k_WallRadius, m_WhatIsWall)) &&
-				!m_Grounded;
-
-			if (m_Walled && !m_FacingRight)
-				Flip ();
-			else if (m_Walled && m_FacingRight)
-				Flip ();
+		
         }
-
 
 		public void Move(float move, bool jump)
         {
-//            // If crouching, check to see if the character can stand up
-//            if (!crouch && m_Anim.GetBool("Crouch"))
-//            {
-//                // If the character has a ceiling preventing them from standing up, keep them crouching
-//                if (Physics2D.OverlapCircle(m_CeilingCheck.position, k_CeilingRadius, m_WhatIsGround))
-//                {
-//                    crouch = true;
-//                }
-//            }
-
-            // Set whether or not the character is crouching in the animator
-           // m_Anim.SetBool("Crouch", crouch);
-
-            //only control the player if grounded or airControl is turned on
 			if (m_Grounded)
             {
-//
-//                // The Speed animator parameter is set to the absolute value of the horizontal input.
-//                //m_Anim.SetFloat("Speed", Mathf.Abs(move));
-//
-//                // Move the character
                 m_Rigidbody2D.velocity = new Vector2(move, m_Rigidbody2D.velocity.y);
-////                // If the input is moving the player right and the player is facing left...
-////                if (move > 0 && !m_FacingRight)
-////                {
-////                    // ... flip the player.
-////                    Flip();
-////                }
-////                    // Otherwise if the input is moving the player left and the player is facing right...
-////                else if (move < 0 && m_FacingRight)
-////                {
-////                    // ... flip the player.
-////                    Flip();
-////                }
             }
-            // If the player should jump...
+
 			if ((m_Grounded || m_Walled) && jump)
-            {
-				m_Rigidbody2D.AddForce(new Vector2((m_FacingRight ? 1 : -1) * m_JumpForce, m_JumpForce));
-            }
+			{
+				m_Rigidbody2D.AddForce(new Vector2((m_WalledLeft ? 0.3f : -0.3f) * m_JumpForce * 3, m_JumpForce * 2));
+			}
+
+			if (_inAir && jump && !_doubleJump) {
+				_doubleJump = true;
+				m_Rigidbody2D.AddForce(new Vector2((m_FacingRight ?  0.3f : -0.3f) * m_JumpForce * 3, m_JumpForce * 2));
+			}
         }
 
 
         public void Flip()
         {
-            // Switch the way the player is labelled as facing.
             m_FacingRight = !m_FacingRight;
-            // Multiply the player's x local scale by -1.
-            Vector3 theScale = transform.localScale;
+
+			Vector3 theScale = _playerSprite.localScale;
             theScale.x *= -1;
-            transform.localScale = theScale;
+			_playerSprite.localScale = theScale;
         }
-			
+
     }
 }

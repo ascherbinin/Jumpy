@@ -21,7 +21,6 @@ namespace UnityStandardAssets._2D
 		[SerializeField] private bool m_WalledRight;  
 		[SerializeField] private Transform m_WallCheckR;   
 		[SerializeField] private Transform m_WallCheckL;   
-        const float k_CeilingRadius = .01f; // Radius of the overlap circle to determine if the player can stand up
         //private Animator m_Anim;            // Reference to the player's animator component.
 		[SerializeField]  private Rigidbody2D m_Rigidbody2D;
         public bool m_FacingRight = true;  // For determining which way the player is currently facing.
@@ -48,15 +47,15 @@ namespace UnityStandardAssets._2D
         {
             m_Grounded = false;
 			m_Walled = false;
-			_inAir = true;
             // The player is grounded if a circlecast to the groundcheck position hits anything designated as ground
             // This can be done using layers instead but Sample Assets will not overwrite your project settings.
-			m_Grounded = Physics2D.OverlapCircleAll(m_GroundCheck.position, k_GroundedRadius, m_WhatIsGround);
+			m_Grounded = Physics2D.OverlapCircle(m_GroundCheck.position, k_GroundedRadius, m_WhatIsGround);
 
 			m_WalledLeft =  Physics2D.OverlapCircle(m_WallCheckL.position, k_WallRadius, m_WhatIsWall)  && !m_Grounded;
 			m_WalledRight = Physics2D.OverlapCircle(m_WallCheckR.position, k_WallRadius, m_WhatIsWall) && !m_Grounded;
 
 			if (m_WalledLeft || m_WalledRight) {
+				m_Rigidbody2D.gravityScale = 0.5f;
 				m_Walled = true;
 				if (_inAir)
 					Flip ();
@@ -65,6 +64,9 @@ namespace UnityStandardAssets._2D
 			if (m_Walled || m_Grounded) {
 				_inAir = false;
 				_doubleJump = false;
+			} else {
+				m_Rigidbody2D.gravityScale = 1.3f;
+				_inAir = true;
 			}
 
 		
@@ -84,7 +86,7 @@ namespace UnityStandardAssets._2D
 
 			if (_inAir && jump && !_doubleJump) {
 				_doubleJump = true;
-				m_Rigidbody2D.AddForce(new Vector2((m_FacingRight ?  0.3f : -0.3f) * m_JumpForce * 3, m_JumpForce * 2));
+				m_Rigidbody2D.AddForce(new Vector2((m_FacingRight ?  0.3f : -0.3f) * m_JumpForce * 1.5f, m_JumpForce * 1.3f));
 			}
         }
 

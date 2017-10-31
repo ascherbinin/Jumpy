@@ -1,9 +1,7 @@
 using System;
 using UnityEngine;
 
-namespace UnityStandardAssets._2D
-{
-    public class PlatformerCharacter2D : MonoBehaviour
+public class PlatformerCharacter2D : MonoBehaviour
     {
        [SerializeField] private float m_JumpForce = 400f;                  // Amount of force added when the player jumps.
         //[Range(0, 1)] [SerializeField] private float m_CrouchSpeed = .36f;  // Amount of maxSpeed applied to crouching movement. 1 = 100%
@@ -16,6 +14,8 @@ namespace UnityStandardAssets._2D
 		const float k_WallRadius = .1f; 
 		[SerializeField] private bool m_Grounded;  
 		public bool isGrounded { get { return m_Grounded; } }
+
+		public bool isAlive = true;
 		[SerializeField] private bool m_Walled;  
 		[SerializeField] private bool m_WalledLeft;  
 		[SerializeField] private bool m_WalledRight;  
@@ -101,4 +101,3 @@ namespace UnityStandardAssets._2D
         }
 
     }
-}

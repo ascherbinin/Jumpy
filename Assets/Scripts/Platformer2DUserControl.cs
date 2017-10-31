@@ -32,19 +32,20 @@ namespace UnityStandardAssets._2D
         {
             // Read the inputs.
             //bool crouch = Input.GetKey(KeyCode.LeftControl);
+			if (m_Character.isAlive) {
+				h = (m_Character.m_FacingRight ? 1 : -1) * _speed * Time.deltaTime;
 
-			h = (m_Character.m_FacingRight ? 1 : -1) * _speed * Time.deltaTime;
+				if(transform.position.x >= 1.85f && m_Character.m_FacingRight && m_Character.isGrounded) {
+					m_Character.Flip ();
+				}
 
-			if(transform.position.x >= 1.85f && m_Character.m_FacingRight && m_Character.isGrounded) {
-				m_Character.Flip ();
+				if(transform.position.x <= -1.85 && !m_Character.m_FacingRight && m_Character.isGrounded) {
+					m_Character.Flip ();
+				}
+	            // Pass all parameters to the character control script.
+	            m_Character.Move(h, m_Jump);
+	            m_Jump = false;
 			}
-
-			if(transform.position.x <= -1.85 && !m_Character.m_FacingRight && m_Character.isGrounded) {
-				m_Character.Flip ();
-			}
-            // Pass all parameters to the character control script.
-            m_Character.Move(h, m_Jump);
-            m_Jump = false;
         }
     }
 }

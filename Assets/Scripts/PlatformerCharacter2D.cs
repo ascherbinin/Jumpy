@@ -81,12 +81,12 @@ public class PlatformerCharacter2D : MonoBehaviour
 
 			if ((m_Grounded || m_Walled) && jump)
 			{
-				m_Rigidbody2D.AddForce(new Vector2((m_WalledLeft ? 0.3f : -0.3f) * m_JumpForce * 3, m_JumpForce * 2));
+			m_Rigidbody2D.AddForce(new Vector2((m_WalledLeft ? 0.3f : -0.3f) * m_JumpForce * 3, m_JumpForce * 2), ForceMode2D.Impulse);
 			}
 
 			if (_inAir && jump && !_doubleJump) {
 				_doubleJump = true;
-				m_Rigidbody2D.AddForce(new Vector2((m_FacingRight ?  0.3f : -0.3f) * m_JumpForce * 1.5f, m_JumpForce * 1.3f));
+			m_Rigidbody2D.AddForce(new Vector2((m_FacingRight ?  0.3f : -0.3f) * m_JumpForce * 1.5f, m_JumpForce * 1.3f), ForceMode2D.Impulse);
 			}
         }
 

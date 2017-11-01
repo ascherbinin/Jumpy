@@ -25,7 +25,12 @@ public class SawScript : MonoBehaviour {
 			var goCollider = other.gameObject.GetComponent<BoxCollider2D> ();
 			goRB.freezeRotation = false;
 			other.gameObject.GetComponent<PlatformerCharacter2D> ().isAlive = false;
-			goRB.AddForce (new Vector2 (_collider.offset.x - goCollider.offset.x, _collider.offset.y - goCollider.offset.y).normalized * 100);
+			var deltaX = other.gameObject.transform.position.x - _collider.offset.x;
+			var deltaY = other.gameObject.transform.position.y - _collider.offset.y;
+			var forceVector = new Vector2 (-deltaX, -deltaY).normalized;
+			Debug.Log (forceVector);
+			goRB.AddForce (forceVector * 2, ForceMode2D.Impulse);
+			goRB.AddTorque(5, ForceMode2D.Impulse);
 			Debug.Log("Touch player");
 //			Destroy(gameObject);
 		}

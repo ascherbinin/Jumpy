@@ -1225,11 +1225,11 @@ Prefab:
     m_Modifications:
     - target: {fileID: 22409990, guid: 81154777d5417884981849c5243f6c01, type: 2}
       propertyPath: m_LocalPosition.x
-      value: 512
+      value: 320
       objectReference: {fileID: 0}
     - target: {fileID: 22409990, guid: 81154777d5417884981849c5243f6c01, type: 2}
       propertyPath: m_LocalPosition.y
-      value: 384
+      value: 568
       objectReference: {fileID: 0}
     - target: {fileID: 22409990, guid: 81154777d5417884981849c5243f6c01, type: 2}
       propertyPath: m_LocalPosition.z
@@ -1822,10 +1822,10 @@ GameObject:
   serializedVersion: 5
   m_Component:
   - component: {fileID: 1812468407}
-  - component: {fileID: 1812468406}
   - component: {fileID: 1812468409}
   - component: {fileID: 1812468410}
   - component: {fileID: 1812468408}
+  - component: {fileID: 1812468406}
   m_Layer: 0
   m_Name: Player
   m_TagString: Player
@@ -1833,8 +1833,8 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!61 &1812468406
-BoxCollider2D:
+--- !u!60 &1812468406
+PolygonCollider2D:
   m_ObjectHideFlags: 0
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
@@ -1855,9 +1855,19 @@ BoxCollider2D:
     drawMode: 0
     adaptiveTiling: 0
   m_AutoTiling: 0
-  serializedVersion: 2
-  m_Size: {x: 0.79, y: 0.67}
-  m_EdgeRadius: 0
+  m_Points:
+    m_Paths:
+    - - {x: 0.21586993, y: 0.36243033}
+      - {x: 0.13453275, y: 0.3096187}
+      - {x: -0.11671968, y: 0.29437447}
+      - {x: -0.20730941, y: 0.33762383}
+      - {x: -0.35866892, y: 0.30901718}
+      - {x: -0.3694123, y: 0.14763117}
+      - {x: -0.36187467, y: -0.22666979}
+      - {x: -0.19281949, y: -0.33100605}
+      - {x: 0.18616693, y: -0.33209467}
+      - {x: 0.36694345, y: -0.22468996}
+      - {x: 0.3837701, y: 0.31403732}
 --- !u!4 &1812468407
 Transform:
   m_ObjectHideFlags: 0
@@ -1892,7 +1902,7 @@ Rigidbody2D:
   m_GravityScale: 1
   m_Material: {fileID: 0}
   m_Interpolate: 0
-  m_SleepingMode: 1
+  m_SleepingMode: 0
   m_CollisionDetection: 1
   m_Constraints: 4
 --- !u!114 &1812468409
@@ -1919,7 +1929,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d08f91df3bd212f429df17f53ce2f364, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_JumpForce: 3.5
+  m_JumpForce: 4.5
   m_WhatIsGround:
     serializedVersion: 2
     m_Bits: 256
@@ -1936,7 +1946,7 @@ MonoBehaviour:
   m_Rigidbody2D: {fileID: 0}
   m_FacingRight: 1
   _doubleJump: 0
-  _inAir: 0
+  _inAir: 1
   _playerSprite: {fileID: 0}
 --- !u!1001 &1857186494
 Prefab:

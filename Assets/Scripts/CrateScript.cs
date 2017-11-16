@@ -5,8 +5,10 @@ using UnityEngine;
 public class CrateScript : MonoBehaviour {
 
 	void OnCollisionEnter2D(Collision2D coll) {
-		if (coll.gameObject.tag == "Player")
-			Debug.Log ("TOUCH PLAYER");
+		if (coll.gameObject.tag == "Player") {
+			Destroy (gameObject);
+			GameManager.instance.AddCoin ();
+		}
 
 	}
 }

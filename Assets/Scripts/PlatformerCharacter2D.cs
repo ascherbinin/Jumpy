@@ -69,7 +69,7 @@ public class PlatformerCharacter2D : MonoBehaviour
 				_inAir = true;
 			}
 
-		
+			GameManager.instance.ChangeHeight ((int)transform.position.y);
         }
 
 		public void Move(float move, bool jump)

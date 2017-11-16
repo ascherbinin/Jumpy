@@ -4,28 +4,26 @@ using UnityEngine;
 
 public class SpawnerScript : MonoBehaviour {
 
-	public GameObject spawnOrbitObject;
-	public GameObject badCircleObject;
+	public GameObject playerGO;
+	private float _startY;
+	public GameObject spawnCrateObject;
 	public float timeToSpawn = 2F;
+	public float maxX;
+	public float minX;
 
-	private Vector2 _centerPosition = new Vector2(0,0);
 	// Use this for initialization
 	void Start () {
+		_startY = transform.position.y;
 		InvokeRepeating ("Spawn", 0F, timeToSpawn);
+		maxX -= spawnCrateObject.transform.localScale.x;
+		minX += spawnCrateObject.transform.localScale.x;
 	}
-	
-	// Update is called once per frame
+
 	void Update () {
-//		_lastTimeSpawn += Time.deltaTime;
-//		if (_lastTimeSpawn > TimeToSpawn) {
-//			Spawn ();
-//		}
+		transform.position = new Vector2(transform.position.x, playerGO.transform.position.y + _startY);
 	}
 
 	void Spawn() {
-//		_lastTimeSpawn = 0.0F;
-
-		var orbit = Instantiate (spawnOrbitObject, gameObject.transform.position, Quaternion.identity);
-		orbit.name = string.Format ("Orbit [{0}]", GameManager.instance.GetOrbitsCount () + 1);
+		var crate = Instantiate (spawnCrateObject, new Vector2(Random.Range(minX, maxX) ,gameObject.transform.position.y), Quaternion.identity);
 	}
 }

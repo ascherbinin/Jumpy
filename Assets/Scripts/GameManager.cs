@@ -3,16 +3,18 @@ using System.Collections.Generic;
 using UnityEngine;
 using System.Linq;
 using UnityEngine.UI;
+using UnityEngine.SceneManagement;
 
 public class GameManager : MonoBehaviour {
 
-	public static GameManager instance = null;                                  
-	public int playerSpeed = 3;      
-	public Text scoreText;
+	public static GameManager instance = null;                                      
+	public Text coinsText;
+	public Text topHeightText;
+	public Text currentHeightText;
 
-	private List<GameObject> _orbits = new List<GameObject> ();
-
-	private int _score;
+	private int _coins;
+	private int _height;
+	private int _topHeight = 0;
 	//Awake is always called before any Start functions
 	void Awake()
 	{
@@ -31,47 +33,22 @@ public class GameManager : MonoBehaviour {
 
 	}
 
+	public void AddCoin() {
+		_coins++;
+		coinsText.text =  _coins.ToString ("000");
+	}
 
-
-	//Update is called every frame.
-	void Update()
-	{
-		if ((int)Time.time % 10 == 0) {
-			AddScore(Random.Range(10, 50));
+	public void ChangeHeight(int meters) {
+		_height = meters;
+		if (_topHeight < _height) {
+			_topHeight = _height;
+			topHeightText.text = _topHeight.ToString ("00000");
 		}
+		currentHeightText.text =  _height.ToString ("00000");
 	}
 
-	public void AddOrbit(GameObject orbit) {
-		_orbits.Add (orbit);
-	}
-
-	public void RemoveOrbit(GameObject orbit) {
-		_orbits.Remove (orbit);
-	}
-
-	public int GetOrbitsCount() {
-		return _orbits.Count;
-	}
-
-	public GameObject GetNextOrbit(GameObject currentOrbit) {
-		var index = _orbits.IndexOf (currentOrbit);
-		if (index + 1 < _orbits.Count)
-			return _orbits [index + 1];
-		else
-			return null;
-	}
-
-	public GameObject GetPreviosOrbit(GameObject currentOrbit) {
-		var index = _orbits.IndexOf (currentOrbit);
-		if (index - 1 > -1)
-			return _orbits [index - 1];
-		else
-			return null;
-	}
-
-	public void AddScore(int score) {
-		_score += score;
-		scoreText.text =  _score.ToString ("0000000000");
+	public void Restart() {
+		SceneManager.LoadScene (SceneManager.GetActiveScene ().name);
 	}
 
 }
